@@ -1,9 +1,9 @@
-import psycopg2
+import psycopg2 
 import pandas as pd
 import streamlit as st
 
-st.title('DB 연동')
-name = st.text_input('고객 이름', '박지성')
+st.title('도서 검색')
+name = st.text_input('작가 이름', '한강')
 
 if st.button('Search'):
     try:
@@ -16,16 +16,16 @@ if st.button('Search'):
             channel_binding='require'
         )
 
-        sql = '''SELECT o.orderid, c.name, b.bookname, o.saleprice, o.orderdate
-                 FROM Customer c, Orders o, Book b
-                 WHERE c.name=%s AND c.custid=o.custid AND b.bookid=o.bookid
-                 ORDER BY o.orderid'''
+        sql = '''SELECT bookname, author
+                 FROM Book
+                  WHERE author=%s
+                  ORDER BY bookid'''
 
         with dbConn.cursor() as cursor:
             cursor.execute(sql, (name,))
             result = pd.DataFrame(
                 cursor.fetchall(),
-                columns=['orderid', 'name', 'bookname', 'saleprice', 'orderdate']
+                columns=['도서명', '작가']
             )
 
         dbConn.close()
